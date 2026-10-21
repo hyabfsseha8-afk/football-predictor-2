@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 
-# 1. Custom Styling (Fixed the previous type error!)
+# 1. Custom Styling 
 st.markdown("""
     <style>
     .main {
@@ -23,34 +23,21 @@ API_URL = "https://football-data.org"
 HEADERS = {"X-Auth-Token": API_KEY}
 
 # 3. Fetch live data safely with Streamlit caching
-@st.cache_data(ttl=3600)  # Caches the data for 1 hour to stay under the free tier limit
+@st.cache_data(ttl=3600)
 def load_football_data():
-    if API_KEY == "83d3eaf8bc79498f91098bf16828d7ea":
-        st.warning("⚠️ Using sample data. Please replace 'YOUR_FREE_API_KEY_HERE' with your real API token.")
-        # Fixed Syntax: Added mock data elements inside the lists
-        mock_data = {
-            'position':,
-            'team.name': ['Arsenal', 'Manchester City', 'Liverpool'],
-            'playedGames':,
-            'won':,
-            'draw':,
-            'lost':,
-            'goalsFor':,
-            'goalsAgainst':,
-            'goalDifference':,
-            'points': [58, 56, 53]
-        }
-        return pd.DataFrame(mock_data)
+    if API_KEY == "83d3eaf8bc79498f91098bf16828d7ea" or API_KEY == "":
+        st.error("Please insert your real football-data.org API token on line 20.")
+        return None
 
     try:
         response = requests.get(API_URL, headers=HEADERS)
         if response.status_code == 200:
             data = response.json()
-            # Flattens the nested table response into a clean table structure
+            # Extracts the list of team stats from the API response
             standings_table = data['standings'][0]['table']
             df = pd.json_normalize(standings_table)
             
-            # Select and clean the essential columns for your predictor model
+            # Filter down to the essential numeric columns
             cleaned_df = df[[
                 'position', 
                 'team.name', 
@@ -65,23 +52,27 @@ def load_football_data():
             ]]
             return cleaned_df
         else:
-            st.error(f"Error fetching data from API (Status Code: {response.status_code})")
+            st.error(f"API Error: Received status code {response.status_code}. Check your API Key limits.")
             return None
     except Exception as e:
         st.error(f"Network connection failed: {e}")
         return None
 
-# Execute the function to get the data frame
+# Run the function
 df = load_football_data()
 
-# 4. Display the Data in your App
+# 4. Display the Data safely
 if df is not None:
     st.write("### Current Premier League Standings")
     st.dataframe(df, use_container_width=True)
     
-    # Example metric layout for your predictor UI
     st.write("### Predictor Metric Summary")
     col1, col2, col3 = st.columns(3)
-    col1.metric("Top Team", df.iloc[0]['team.name'], f"{df.iloc[0]['points']} pts")
+    
+    # Corrected panda row indexing using .iloc for structural safety
+    top_team_name = df.iloc[0]['team.name']
+    top_team_pts = df.iloc[0]['points']
+    
+    col1.metric("Top Team", str(top_team_name), f"{top_team_pts} pts")
     col2.metric("Total Teams Tracked", len(df))
     col3.metric("Avg Games Played", int(df['playedGames'].mean()))
