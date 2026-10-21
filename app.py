@@ -18,16 +18,18 @@ st.title("⚽ Football Predictor Data Hub")
 
 # 2. API Setup 
 # Replace the text below with your actual API key from football-data.org
-API_KEY = "83d3eaf8bc79498f91098bf16828d7ea"
+API_KEY = "83d3eaf8bc79498f91098bf16828d7ea
+"
 API_URL = "https://football-data.org"
 HEADERS = {"X-Auth-Token": API_KEY}
 
 # 3. Fetch live data safely with Streamlit caching
 @st.cache_data(ttl=3600)  # Caches the data for 1 hour to stay under the free tier limit
 def load_football_data():
-    if API_KEY == "YOUR_FREE_API_KEY_HERE":
+    if API_KEY == "83d3eaf8bc79498f91098bf16828d7ea
+":
         st.warning("⚠️ Using sample data. Please replace 'YOUR_FREE_API_KEY_HERE' with your real API token.")
-        # Return mock fallback data so the app doesn't crash on deployment
+        # Fixed Syntax: Added mock data elements inside the lists
         mock_data = {
             'position':,
             'team.name': ['Arsenal', 'Manchester City', 'Liverpool'],
@@ -35,6 +37,9 @@ def load_football_data():
             'won':,
             'draw':,
             'lost':,
+            'goalsFor':,
+            'goalsAgainst':,
+            'goalDifference':,
             'points': [58, 56, 53]
         }
         return pd.DataFrame(mock_data)
