@@ -18,7 +18,7 @@ st.title("⚽ Football Predictor Data Hub")
 
 # 2. API Setup 
 # Replace the text below with your actual API key from football-data.org
-API_KEY = "YOUR_FREE_API_KEY_HERE"
+API_KEY = "83d3eaf8bc79498f91098bf16828d7ea"
 API_URL = "https://football-data.org"
 HEADERS = {"X-Auth-Token": API_KEY}
 
