@@ -26,8 +26,7 @@ HEADERS = {"X-Auth-Token": API_KEY}
 # 3. Fetch live data safely with Streamlit caching
 @st.cache_data(ttl=3600)  # Caches the data for 1 hour to stay under the free tier limit
 def load_football_data():
-    if API_KEY == "83d3eaf8bc79498f91098bf16828d7ea
-":
+    if API_KEY == "YOUR_FREE_API_KEY_HERE":
         st.warning("⚠️ Using sample data. Please replace 'YOUR_FREE_API_KEY_HERE' with your real API token.")
         # Fixed Syntax: Added mock data elements inside the lists
         mock_data = {
