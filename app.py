@@ -21,7 +21,7 @@ HEADERS = {"X-Auth-Token": API_KEY}
 # REMOVED THE CACHE DECORATOR TEMPORARILY TO FORCE STREAMLIT TO LIVE-REFRESH THE NEW KEY
 def load_football_data():
     # If you forgot to swap it, show an error
-    if API_KEY == "83d3eaf8bc79498f91098bf16828d7ea" or API_KEY == "":
+    if API_KEY == "PASTE_YOUR_ACTUAL_API_KEY_HERE" or API_KEY == "":
         st.error("⚠️ The code is still seeing the placeholder text. Please paste your actual letters/numbers key into the quotes on line 16.")
         return None
 
