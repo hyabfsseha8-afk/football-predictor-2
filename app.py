@@ -5,38 +5,36 @@ import requests
 # 1. Custom Styling 
 st.markdown("""
     <style>
-    .main {
-        background-color: #f5f7f8;
-    }
-    h1 {
-        color: #1e3d59;
-    }
+    .main { background-color: #f5f7f8; }
+    h1 { color: #1e3d59; }
     </style>
 """, unsafe_allow_html=True)
 
 st.title("⚽ Football Predictor Data Hub")
 
-# 2. API Setup 
-API_KEY =["83d3eaf8bc79498f91098bf16828d7ea"]
-API_URL = "https://football-data.org"
+# 2. API Setup - PASTE YOUR COPIED KEY DIRECTLY INSIDE THESE QUOTES
+API_KEY = "83d3eaf8bc79498f91098bf16828d7ea"  
+API_URL = "https://api.football-data.org/v4/competitions/PL/standings"
 HEADERS = {"X-Auth-Token": API_KEY}
 
-# 3. Fetch live data safely with Streamlit caching
-@st.cache_data(ttl=3600)
+# 3. Fetch live data safely
+# REMOVED THE CACHE DECORATOR TEMPORARILY TO FORCE STREAMLIT TO LIVE-REFRESH THE NEW KEY
 def load_football_data():
+    # If you forgot to swap it, show an error
     if API_KEY == "83d3eaf8bc79498f91098bf16828d7ea" or API_KEY == "":
-        st.error("Please insert your real football-data.org API token on line 20.")
+        st.error("⚠️ The code is still seeing the placeholder text. Please paste your actual letters/numbers key into the quotes on line 16.")
         return None
 
     try:
         response = requests.get(API_URL, headers=HEADERS)
         if response.status_code == 200:
             data = response.json()
-            # Extracts the list of team stats from the API response
-            standings_table = data['standings'][0]['table']
-            df = pd.json_normalize(standings_table)
             
-            # Filter down to the essential numeric columns
+            # The API layout returns standings as a list of dictionaries
+            # We must target the first block in the list to extract the team rows
+            standings_list = data['standings'][0]['table']
+            df = pd.json_normalize(standings_list)
+            
             cleaned_df = df[[
                 'position', 
                 'team.name', 
@@ -50,14 +48,16 @@ def load_football_data():
                 'points'
             ]]
             return cleaned_df
+        elif response.status_code == 403:
+            st.error("🚫 API Key Error: Your API key was rejected by the server (403 Forbidden). Double-check for typos or spaces.")
+            return None
         else:
-            st.error(f"API Error: Received status code {response.status_code}. Check your API Key limits.")
+            st.error(f"API Error: Received status code {response.status_code}.")
             return None
     except Exception as e:
         st.error(f"Network connection failed: {e}")
         return None
 
-# Run the function
 df = load_football_data()
 
 # 4. Display the Data safely
@@ -68,7 +68,7 @@ if df is not None:
     st.write("### Predictor Metric Summary")
     col1, col2, col3 = st.columns(3)
     
-    # Corrected panda row indexing using .iloc for structural safety
+    # Structural row fetching using pandas .iloc
     top_team_name = df.iloc[0]['team.name']
     top_team_pts = df.iloc[0]['points']
     
